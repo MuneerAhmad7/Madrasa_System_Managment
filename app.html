@@ -1,0 +1,3975 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jamia Sayyidna Umar (RA) - Madrasa Management System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Nastaliq+Urdu:wght@400;700&family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.1/jspdf.plugin.autotable.min.js"></script>
+    <style>
+      :root {
+        --primary: #0d6b3f;
+        --primary-light: #15a05e;
+        --primary-dark: #064d2c;
+        --gold: #c9a84c;
+        --gold-light: #e4cc7a;
+        --gold-dark: #a68a2e;
+        --bg: #f4f1eb;
+        --bg-card: #ffffff;
+        --bg-sidebar: #064d2c;
+        --text: #1a1a1a;
+        --text-secondary: #5a5a5a;
+        --text-inverse: #f4f1eb;
+        --border: #d4cfc5;
+        --shadow: rgba(0, 0, 0, 0.08);
+        --danger: #c0392b;
+        --danger-light: #e74c3c;
+        --warning: #d4a017;
+        --success: #1a8b4c;
+        --info: #2471a3;
+        --radius: 10px;
+        --radius-sm: 6px;
+        --transition: 0.25s ease;
+      }
+      html.dark {
+        --bg: #0f1a14;
+        --bg-card: #162b1f;
+        --bg-sidebar: #0a1f12;
+        --text: #e8e2d6;
+        --text-secondary: #a8a090;
+        --border: #2a3d30;
+        --shadow: rgba(0, 0, 0, 0.3);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Source Sans 3", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+        line-height: 1.5;
+      }
+      .urdu-text {
+        font-family: "Noto Nastaliq Urdu", "Amiri", serif;
+        direction: rtl;
+      }
+      .arabic-calligraphy {
+        font-family: "Amiri", serif;
+      }
+      .display-font {
+        font-family: "Playfair Display", serif;
+      }
+
+      /* Login Screen */
+      #loginScreen {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          #064d2c 0%,
+          #0d6b3f 40%,
+          #1a8b4c 70%,
+          #c9a84c 100%
+        );
+        position: relative;
+        overflow: hidden;
+      }
+      #loginScreen::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      }
+      .login-box {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 48px 40px;
+        width: 420px;
+        max-width: 92vw;
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        color: #fff;
+      }
+      .login-box .bismillah {
+        font-family: "Amiri", serif;
+        font-size: 28px;
+        color: var(--gold-light);
+        margin-bottom: 8px;
+      }
+      .login-box h1 {
+        font-family: "Playfair Display", serif;
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+      .login-box .urdu-title {
+        font-family: "Noto Nastaliq Urdu", serif;
+        font-size: 22px;
+        color: var(--gold-light);
+        margin-bottom: 4px;
+        line-height: 2;
+      }
+      .login-box .subtitle {
+        font-size: 13px;
+        opacity: 0.8;
+        margin-bottom: 28px;
+      }
+      .login-field {
+        position: relative;
+        margin-bottom: 18px;
+        text-align: left;
+      }
+      .login-field i {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 14px;
+      }
+      .login-field input {
+        width: 100%;
+        padding: 14px 14px 14px 42px;
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        border-radius: var(--radius);
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-size: 16px;
+        font-family: "Source Sans 3", sans-serif;
+        outline: none;
+        transition: var(--transition);
+      }
+      .login-field input::placeholder {
+        color: rgba(255, 255, 255, 0.5);
+      }
+      .login-field input:focus {
+        border-color: var(--gold);
+        background: rgba(255, 255, 255, 0.15);
+      }
+      .login-btn {
+        width: 100%;
+        padding: 14px;
+        border: none;
+        border-radius: var(--radius);
+        background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+        color: #1a1a1a;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        font-family: "Source Sans 3", sans-serif;
+        margin-top: 8px;
+      }
+      .login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(201, 168, 76, 0.4);
+      }
+      .login-hint {
+        margin-top: 20px;
+        font-size: 12px;
+        opacity: 0.6;
+        line-height: 1.7;
+      }
+
+      /* App Layout */
+      #appContainer {
+        display: none;
+        min-height: 100vh;
+      }
+      #appContainer.active {
+        display: flex;
+      }
+
+      /* Sidebar */
+      .sidebar {
+        width: 260px;
+        background: var(--bg-sidebar);
+        color: var(--text-inverse);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+        transition: transform 0.3s ease;
+        overflow-y: auto;
+      }
+      .sidebar-header {
+        padding: 20px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        text-align: center;
+      }
+      .sidebar-header .mosque-icon {
+        font-size: 28px;
+        color: var(--gold);
+        margin-bottom: 6px;
+      }
+      .sidebar-header h2 {
+        font-family: "Playfair Display", serif;
+        font-size: 15px;
+        line-height: 1.4;
+      }
+      .sidebar-header .sid-urdu {
+        font-family: "Noto Nastaliq Urdu", serif;
+        font-size: 14px;
+        color: var(--gold-light);
+        direction: rtl;
+        line-height: 2;
+      }
+      .sidebar-nav {
+        flex: 1;
+        padding: 12px 0;
+      }
+      .nav-section-title {
+        padding: 8px 20px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: rgba(255, 255, 255, 0.35);
+        margin-top: 8px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 20px;
+        cursor: pointer;
+        transition: var(--transition);
+        font-size: 14px;
+        border-left: 3px solid transparent;
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .nav-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+      .nav-item.active {
+        background: rgba(201, 168, 76, 0.15);
+        border-left-color: var(--gold);
+        color: var(--gold-light);
+      }
+      .nav-item i {
+        width: 20px;
+        text-align: center;
+        font-size: 15px;
+      }
+      .sidebar-footer {
+        padding: 16px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 12px;
+        text-align: center;
+        opacity: 0.5;
+      }
+
+      /* Main */
+      .main-content {
+        flex: 1;
+        margin-left: 260px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+      .topbar {
+        background: var(--bg-card);
+        padding: 12px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .topbar-left {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        font-size: 20px;
+        color: var(--text);
+        cursor: pointer;
+      }
+      .topbar-title {
+        font-family: "Playfair Display", serif;
+        font-size: 18px;
+        font-weight: 600;
+      }
+      .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .topbar-btn {
+        background: none;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 7px 12px;
+        cursor: pointer;
+        font-size: 13px;
+        color: var(--text-secondary);
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-family: "Source Sans 3", sans-serif;
+      }
+      .topbar-btn:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .topbar-user {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 12px;
+        border-radius: var(--radius);
+        cursor: pointer;
+      }
+      .topbar-user .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--primary), var(--gold));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 600;
+        font-size: 14px;
+      }
+      .topbar-user .user-info {
+        font-size: 13px;
+        line-height: 1.3;
+      }
+      .topbar-user .user-name {
+        font-weight: 600;
+      }
+      .topbar-user .user-role {
+        color: var(--text-secondary);
+        font-size: 11px;
+      }
+
+      .page-content {
+        padding: 24px 28px;
+        flex: 1;
+      }
+
+      /* Cards */
+      .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 4px var(--shadow);
+      }
+      .card-title {
+        font-family: "Playfair Display", serif;
+        font-size: 16px;
+        font-weight: 600;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .card-title i {
+        color: var(--primary);
+      }
+
+      /* Stat Cards */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 1px 4px var(--shadow);
+      }
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+      }
+      .stat-card.income::before {
+        background: linear-gradient(
+          90deg,
+          var(--success),
+          var(--primary-light)
+        );
+      }
+      .stat-card.expense::before {
+        background: linear-gradient(90deg, var(--danger), var(--danger-light));
+      }
+      .stat-card.balance::before {
+        background: linear-gradient(90deg, var(--gold-dark), var(--gold));
+      }
+      .stat-card.inventory::before {
+        background: linear-gradient(90deg, var(--info), #5dade2);
+      }
+      .stat-label {
+        font-size: 12px;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+      }
+      .stat-value {
+        font-family: "Playfair Display", serif;
+        font-size: 26px;
+        font-weight: 700;
+      }
+      .stat-sub {
+        font-size: 12px;
+        color: var(--text-secondary);
+        margin-top: 4px;
+      }
+      .stat-icon {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        font-size: 28px;
+        opacity: 0.12;
+      }
+
+      /* Tables */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+      th {
+        background: var(--bg);
+        text-align: left;
+        padding: 10px 12px;
+        font-weight: 600;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-secondary);
+        border-bottom: 2px solid var(--border);
+        white-space: nowrap;
+      }
+      td {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:hover td {
+        background: rgba(13, 107, 63, 0.03);
+      }
+      .badge {
+        display: inline-block;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .badge-income {
+        background: rgba(26, 139, 76, 0.12);
+        color: var(--success);
+      }
+      .badge-expense {
+        background: rgba(192, 57, 43, 0.12);
+        color: var(--danger);
+      }
+      .badge-warning {
+        background: rgba(212, 160, 23, 0.12);
+        color: var(--warning);
+      }
+      .badge-info {
+        background: rgba(36, 113, 163, 0.12);
+        color: var(--info);
+      }
+
+      /* Forms */
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        margin-bottom: 5px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+      .form-group input,
+      .form-group select,
+      .form-group textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        background: var(--bg);
+        color: var(--text);
+        font-size: 16px;
+        font-family: "Source Sans 3", sans-serif;
+        outline: none;
+        transition: var(--transition);
+      }
+      .form-group input:focus,
+      .form-group select:focus,
+      .form-group textarea:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(13, 107, 63, 0.1);
+      }
+      .form-group textarea {
+        resize: vertical;
+        min-height: 70px;
+      }
+
+      /* Buttons */
+      .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: var(--radius-sm);
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: "Source Sans 3", sans-serif;
+        transition: var(--transition);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .btn-primary {
+        background: var(--primary);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--primary-dark);
+      }
+      .btn-gold {
+        background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+        color: #1a1a1a;
+      }
+      .btn-gold:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: #fff;
+      }
+      .btn-danger:hover {
+        background: #a93226;
+      }
+      .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+      .btn-outline:hover {
+        border-color: var(--primary);
+        color: var(--primary);
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      .action-bar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-bottom: 18px;
+      }
+      .action-bar .spacer {
+        flex: 1;
+      }
+      .search-input {
+        padding: 8px 12px 8px 34px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        font-size: 14px;
+        background: var(--bg);
+        color: var(--text);
+        width: 220px;
+        font-family: "Source Sans 3", sans-serif;
+      }
+
+      /* Charts */
+      .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+        gap: 20px;
+        margin-bottom: 24px;
+      }
+      .chart-container {
+        position: relative;
+        height: 280px;
+      }
+
+      /* Modal */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+      .modal-overlay.active {
+        display: flex;
+      }
+      .modal {
+        background: var(--bg-card);
+        border-radius: 14px;
+        width: 560px;
+        max-width: 100%;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      }
+      .modal-header {
+        padding: 18px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .modal-header h3 {
+        font-family: "Playfair Display", serif;
+        font-size: 18px;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-secondary);
+        padding: 4px;
+      }
+      .modal-body {
+        padding: 24px;
+      }
+      .modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+      }
+
+      /* Toast */
+      .toast-container {
+        position: fixed;
+        top: 16px;
+        right: 16px;
+        z-index: 300;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .toast {
+        padding: 12px 20px;
+        border-radius: var(--radius-sm);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        animation: slideIn 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        max-width: 360px;
+      }
+      .toast-success {
+        background: var(--success);
+      }
+      .toast-error {
+        background: var(--danger);
+      }
+      .toast-warning {
+        background: var(--warning);
+      }
+      .toast-info {
+        background: var(--info);
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      /* Page sections */
+      .page-section {
+        display: none;
+      }
+      .page-section.active {
+        display: block;
+        animation: fadeIn 0.3s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Notification bell */
+      .notif-badge {
+        position: relative;
+      }
+      .notif-badge::after {
+        content: attr(data-count);
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        background: var(--danger);
+        color: #fff;
+        font-size: 9px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+      }
+
+      /* Audit Trail */
+      .audit-item {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 12px;
+        font-size: 13px;
+      }
+      .audit-item .audit-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba(13, 107, 63, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary);
+        flex-shrink: 0;
+      }
+      .audit-time {
+        font-size: 11px;
+        color: var(--text-secondary);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .sidebar {
+          transform: translateX(-100%);
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main-content {
+          margin-left: 0;
+        }
+        .menu-toggle {
+          display: block;
+        }
+        .page-content {
+          padding: 16px;
+        }
+        .topbar {
+          padding: 10px 16px;
+        }
+        .stats-grid {
+          grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+          gap: 10px;
+        }
+        .stat-card {
+          padding: 14px;
+        }
+        .stat-value {
+          font-size: 20px;
+        }
+        .charts-grid {
+          grid-template-columns: 1fr;
+        }
+        .form-grid {
+          grid-template-columns: 1fr;
+        }
+        .action-bar {
+          flex-direction: column;
+          align-items: stretch;
+        }
+        .search-input {
+          width: 100%;
+        }
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: var(--text-secondary);
+      }
+
+      /* Print */
+      @media print {
+        .sidebar,
+        .topbar {
+          display: none !important;
+        }
+        .main-content {
+          margin-left: 0 !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen">
+      <div class="login-box">
+        <div class="bismillah">﷽</div>
+        <div class="urdu-title">جامعہ سیدنا عمر رضی اللہ عنہ</div>
+        <h1>Jamia Sayyidna Umar (RA)</h1>
+        <p class="subtitle">G-11/3 Islamabad &middot; Management System</p>
+        <div class="login-field">
+          <i class="fas fa-user"></i>
+          <input
+            type="text"
+            id="loginUser"
+            placeholder="Username"
+            autocomplete="off"
+          />
+        </div>
+        <div class="login-field">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="loginPass" placeholder="Password" />
+        </div>
+        <button class="login-btn" id="loginBtn">
+          <i class="fas fa-sign-in-alt"></i>&nbsp; Sign In
+        </button>
+        <p class="login-hint">
+          Demo: admin / admin123 &bull; accountant / acc123<br />inventory /
+          inv123 &bull; viewer / view123
+        </p>
+      </div>
+    </div>
+
+    <!-- App Container -->
+    <div id="appContainer">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="mosque-icon">🕌</div>
+          <h2>Jamia Sayyidna Umar (RA)</h2>
+          <div class="sid-urdu">جامعہ سیدنا عمر رضی اللہ عنہ</div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-title" data-i18n="nav_overview">Overview</div>
+          <div class="nav-item active" data-page="dashboard">
+            <i class="fas fa-th-large"></i
+            ><span data-i18n="nav_dashboard">Dashboard</span>
+          </div>
+
+          <div class="nav-section-title" data-i18n="nav_finance">Finance</div>
+          <div class="nav-item" data-page="income">
+            <i class="fas fa-hand-holding-usd"></i
+            ><span data-i18n="nav_income">Income</span>
+          </div>
+          <div class="nav-item" data-page="expenses">
+            <i class="fas fa-file-invoice-dollar"></i
+            ><span data-i18n="nav_expenses">Expenses</span>
+          </div>
+          <div class="nav-item" data-page="donors">
+            <i class="fas fa-users"></i
+            ><span data-i18n="nav_donors">Donors</span>
+          </div>
+          <div class="nav-item" data-page="budget">
+            <i class="fas fa-chart-pie"></i
+            ><span data-i18n="nav_budget">Budget</span>
+          </div>
+
+          <div class="nav-section-title" data-i18n="nav_operations">
+            Operations
+          </div>
+          <div class="nav-item" data-page="inventory">
+            <i class="fas fa-boxes-stacked"></i
+            ><span data-i18n="nav_inventory">Inventory</span>
+          </div>
+          <div class="nav-item" data-page="salary">
+            <i class="fas fa-money-check-alt"></i
+            ><span data-i18n="nav_salary">Salaries</span>
+          </div>
+
+          <div class="nav-section-title" data-i18n="nav_system">System</div>
+          <div class="nav-item" data-page="reports">
+            <i class="fas fa-chart-bar"></i
+            ><span data-i18n="nav_reports">Reports</span>
+          </div>
+          <div class="nav-item" data-page="audit">
+            <i class="fas fa-history"></i
+            ><span data-i18n="nav_audit">Audit Trail</span>
+          </div>
+          <div class="nav-item" data-page="users" id="navUsers">
+            <i class="fas fa-user-shield"></i
+            ><span data-i18n="nav_users">Users</span>
+          </div>
+        </nav>
+        <div class="sidebar-footer">v1.0 &copy; 2025 JMU System</div>
+      </aside>
+
+      <!-- Main -->
+      <div class="main-content">
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="menu-toggle" id="menuToggle">
+              <i class="fas fa-bars"></i>
+            </button>
+            <span class="topbar-title" id="pageTitle">Dashboard</span>
+          </div>
+          <div class="topbar-right">
+            <button
+              class="topbar-btn"
+              id="langToggle"
+              title="Toggle Urdu/English"
+            >
+              <i class="fas fa-language"></i><span id="langLabel">اردو</span>
+            </button>
+            <button class="topbar-btn notif-badge" data-count="3" id="notifBtn">
+              <i class="fas fa-bell"></i>
+            </button>
+            <div class="topbar-user" id="topbarUser">
+              <div class="avatar" id="userAvatar">A</div>
+              <div class="user-info">
+                <div class="user-name" id="userName">Admin</div>
+                <div class="user-role" id="userRole">Administrator</div>
+              </div>
+            </div>
+            <button class="topbar-btn" id="logoutBtn" title="Logout">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <!-- DASHBOARD -->
+          <div class="page-section active" id="page-dashboard">
+            <div class="stats-grid" id="dashStats"></div>
+            <div class="charts-grid">
+              <div class="card">
+                <div class="card-title">
+                  <i class="fas fa-chart-area"></i>Monthly Overview
+                </div>
+                <div class="chart-container">
+                  <canvas id="chartOverview"></canvas>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title">
+                  <i class="fas fa-chart-doughnut"></i>Income Categories
+                </div>
+                <div class="chart-container">
+                  <canvas id="chartCategories"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <i class="fas fa-clock"></i
+                ><span data-i18n="recent_transactions"
+                  >Recent Transactions</span
+                >
+              </div>
+              <div class="table-wrap">
+                <table id="recentTable">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Category</th>
+                      <th>Description</th>
+                      <th>Amount (PKR)</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- INCOME -->
+          <div class="page-section" id="page-income">
+            <div class="action-bar">
+              <button class="btn btn-primary" onclick="MMS.openModal('income')">
+                <i class="fas fa-plus"></i>Add Income
+              </button>
+              <button class="btn btn-outline" onclick="MMS.exportCSV('income')">
+                <i class="fas fa-file-csv"></i>Export CSV
+              </button>
+              <div class="spacer"></div>
+              <input
+                class="search-input"
+                placeholder="Search income..."
+                oninput="MMS.filterTable('income', this.value)"
+              />
+            </div>
+            <div class="card">
+              <div class="table-wrap">
+                <table id="incomeTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Date</th>
+                      <th>Category</th>
+                      <th>Donor</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Receipt</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXPENSES -->
+          <div class="page-section" id="page-expenses">
+            <div class="action-bar">
+              <button
+                class="btn btn-primary"
+                onclick="MMS.openModal('expense')"
+              >
+                <i class="fas fa-plus"></i>Add Expense
+              </button>
+              <button
+                class="btn btn-outline"
+                onclick="MMS.exportCSV('expenses')"
+              >
+                <i class="fas fa-file-csv"></i>Export CSV
+              </button>
+              <div class="spacer"></div>
+              <input
+                class="search-input"
+                placeholder="Search expenses..."
+                oninput="MMS.filterTable('expenses', this.value)"
+              />
+            </div>
+            <div class="card">
+              <div class="table-wrap">
+                <table id="expenseTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Date</th>
+                      <th>Category</th>
+                      <th>Vendor</th>
+                      <th>Amount</th>
+                      <th>Method</th>
+                      <th>Bill #</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- DONORS -->
+          <div class="page-section" id="page-donors">
+            <div class="action-bar">
+              <button class="btn btn-primary" onclick="MMS.openModal('donor')">
+                <i class="fas fa-plus"></i>Add Donor
+              </button>
+              <div class="spacer"></div>
+              <input
+                class="search-input"
+                placeholder="Search donors..."
+                oninput="MMS.filterTable('donors', this.value)"
+              />
+            </div>
+            <div class="card">
+              <div class="table-wrap">
+                <table id="donorTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Phone</th>
+                      <th>Email</th>
+                      <th>Type</th>
+                      <th>Total Donated</th>
+                      <th>Last Donation</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- BUDGET -->
+          <div class="page-section" id="page-budget">
+            <div class="action-bar">
+              <button class="btn btn-primary" onclick="MMS.openModal('budget')">
+                <i class="fas fa-plus"></i>Set Budget
+              </button>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <i class="fas fa-chart-pie"></i>Budget vs Actual
+              </div>
+              <div class="table-wrap">
+                <table id="budgetTable">
+                  <thead>
+                    <tr>
+                      <th>Category</th>
+                      <th>Budget (PKR)</th>
+                      <th>Actual (PKR)</th>
+                      <th>Remaining</th>
+                      <th>Utilization</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- INVENTORY -->
+          <div class="page-section" id="page-inventory">
+            <div class="action-bar">
+              <button
+                class="btn btn-primary"
+                onclick="MMS.openModal('inventoryItem')"
+              >
+                <i class="fas fa-plus"></i>Add Item
+              </button>
+              <button
+                class="btn btn-outline"
+                onclick="MMS.exportCSV('inventory')"
+              >
+                <i class="fas fa-file-csv"></i>Export CSV
+              </button>
+              <div class="spacer"></div>
+              <input
+                class="search-input"
+                placeholder="Search inventory..."
+                oninput="MMS.filterTable('inventory', this.value)"
+              />
+            </div>
+            <div class="stats-grid" id="inventoryStats"></div>
+            <div class="card">
+              <div class="table-wrap">
+                <table id="inventoryTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Item</th>
+                      <th>Category</th>
+                      <th>Qty</th>
+                      <th>Unit Price</th>
+                      <th>Value</th>
+                      <th>Reorder Level</th>
+                      <th>Supplier</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- SALARY -->
+          <div class="page-section" id="page-salary">
+            <div class="action-bar">
+              <button
+                class="btn btn-primary"
+                onclick="MMS.openModal('employee')"
+              >
+                <i class="fas fa-plus"></i>Add Employee
+              </button>
+              <button class="btn btn-gold" onclick="MMS.processSalaries()">
+                <i class="fas fa-money-check-alt"></i>Process Monthly Salaries
+              </button>
+            </div>
+            <div class="card">
+              <div class="table-wrap">
+                <table id="salaryTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Name</th>
+                      <th>Role</th>
+                      <th>Base Salary</th>
+                      <th>Allowances</th>
+                      <th>Deductions</th>
+                      <th>Net Salary</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- REPORTS -->
+          <div class="page-section" id="page-reports">
+            <div class="action-bar">
+              <div class="form-group" style="margin: 0; min-width: 140px">
+                <label>From</label><input type="date" id="reportFrom" />
+              </div>
+              <div class="form-group" style="margin: 0; min-width: 140px">
+                <label>To</label><input type="date" id="reportTo" />
+              </div>
+              <button class="btn btn-primary" onclick="MMS.generateReport()">
+                <i class="fas fa-sync"></i>Generate
+              </button>
+              <button class="btn btn-gold" onclick="MMS.exportPDF()">
+                <i class="fas fa-file-pdf"></i>Export PDF
+              </button>
+            </div>
+            <div class="stats-grid" id="reportStats"></div>
+            <div class="charts-grid">
+              <div class="card">
+                <div class="card-title">
+                  <i class="fas fa-chart-bar"></i>Income vs Expenses
+                </div>
+                <div class="chart-container">
+                  <canvas id="chartReport"></canvas>
+                </div>
+              </div>
+              <div class="card">
+                <div class="card-title">
+                  <i class="fas fa-chart-doughnut"></i>Expense Breakdown
+                </div>
+                <div class="chart-container">
+                  <canvas id="chartExpBreak"></canvas>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">
+                <i class="fas fa-list"></i>Detailed Ledger
+              </div>
+              <div class="table-wrap">
+                <table id="reportLedger">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Category</th>
+                      <th>Description</th>
+                      <th>Income</th>
+                      <th>Expense</th>
+                      <th>Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- AUDIT TRAIL -->
+          <div class="page-section" id="page-audit">
+            <div class="card">
+              <div class="card-title">
+                <i class="fas fa-history"></i>Activity Log
+              </div>
+              <div id="auditList"></div>
+            </div>
+          </div>
+
+          <!-- USERS -->
+          <div class="page-section" id="page-users">
+            <div class="action-bar">
+              <button class="btn btn-primary" onclick="MMS.openModal('user')">
+                <i class="fas fa-plus"></i>Add User
+              </button>
+            </div>
+            <div class="card">
+              <div class="table-wrap">
+                <table id="userTable">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Username</th>
+                      <th>Full Name</th>
+                      <th>Role</th>
+                      <th>Email</th>
+                      <th>Phone</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <div class="modal-header">
+          <h3 id="modalTitle">Add Record</h3>
+          <button class="modal-close" onclick="MMS.closeModal()">
+            &times;
+          </button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+        <div class="modal-footer" id="modalFooter">
+          <button class="btn btn-outline" onclick="MMS.closeModal()">
+            Cancel
+          </button>
+          <button class="btn btn-primary" id="modalSave">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ============================================================
+   MADRASA MANAGEMENT SYSTEM - Core Application
+   ============================================================ */
+      const MMS = (() => {
+        // ---- State ----
+        let currentUser = null;
+        let currentLang = "en";
+        let currentPage = "dashboard";
+        let editingId = null;
+        let editingType = null;
+        let charts = {};
+
+        // ---- i18n ----
+        const i18n = {
+          en: {
+            nav_overview: "Overview",
+            nav_dashboard: "Dashboard",
+            nav_finance: "Finance",
+            nav_income: "Income",
+            nav_expenses: "Expenses",
+            nav_donors: "Donors",
+            nav_budget: "Budget",
+            nav_operations: "Operations",
+            nav_inventory: "Inventory",
+            nav_salary: "Salaries",
+            nav_system: "System",
+            nav_reports: "Reports",
+            nav_audit: "Audit Trail",
+            nav_users: "Users",
+            recent_transactions: "Recent Transactions",
+          },
+          ur: {
+            nav_overview: "جائزہ",
+            nav_dashboard: "ڈیش بورڈ",
+            nav_finance: "مالیات",
+            nav_income: "آمدنی",
+            nav_expenses: "اخراجات",
+            nav_donors: "عطیہ دہندگان",
+            nav_budget: "بجٹ",
+            nav_operations: "آپریشنز",
+            nav_inventory: "انوینٹری",
+            nav_salary: "تنخواہیں",
+            nav_system: "سسٹم",
+            nav_reports: "رپورٹس",
+            nav_audit: "آڈٹ ٹریل",
+            nav_users: "صارفین",
+            recent_transactions: "حالیہ لین دین",
+          },
+        };
+
+        // ---- Demo Data ----
+        const DB = {
+          users: [
+            {
+              id: 1,
+              username: "admin",
+              password_hash: "admin123",
+              role: "admin",
+              full_name: "Muhammad Ahmad",
+              email: "admin@jamia.pk",
+              phone: "0300-1234567",
+              is_active: true,
+            },
+            {
+              id: 2,
+              username: "accountant",
+              password_hash: "acc123",
+              role: "accountant",
+              full_name: "Hafiz Bilal",
+              email: "bilal@jamia.pk",
+              phone: "0301-2345678",
+              is_active: true,
+            },
+            {
+              id: 3,
+              username: "inventory",
+              password_hash: "inv123",
+              role: "inventory",
+              full_name: "Qari Saeed",
+              email: "saeed@jamia.pk",
+              phone: "0302-3456789",
+              is_active: true,
+            },
+            {
+              id: 4,
+              username: "viewer",
+              password_hash: "view123",
+              role: "viewer",
+              full_name: "Maulana Tariq",
+              email: "tariq@jamia.pk",
+              phone: "0303-4567890",
+              is_active: true,
+            },
+          ],
+          income: [
+            {
+              id: 1,
+              date: "2025-01-05",
+              category: "Monthly Donation",
+              donor_name: "Haji Abdul Rasheed",
+              amount: 50000,
+              payment_method: "Cash",
+              receipt_number: "REC-2025-001",
+              notes: "Monthly contribution",
+              created_by: "admin",
+              created_at: "2025-01-05 09:00",
+            },
+            {
+              id: 2,
+              date: "2025-01-08",
+              category: "Zakaat",
+              donor_name: "Dr. Farhan Ali",
+              amount: 120000,
+              payment_method: "Bank Transfer",
+              receipt_number: "REC-2025-002",
+              notes: "Annual Zakaat",
+              created_by: "admin",
+              created_at: "2025-01-08 11:30",
+            },
+            {
+              id: 3,
+              date: "2025-01-10",
+              category: "Sadaqaat",
+              donor_name: "Mrs. Ayesha Siddiqui",
+              amount: 25000,
+              payment_method: "Cash",
+              receipt_number: "REC-2025-003",
+              notes: "",
+              created_by: "accountant",
+              created_at: "2025-01-10 14:00",
+            },
+            {
+              id: 4,
+              date: "2025-01-15",
+              category: "Fees",
+              donor_name: "Students Collection",
+              amount: 75000,
+              payment_method: "Cash",
+              receipt_number: "REC-2025-004",
+              notes: "Monthly tuition fees",
+              created_by: "accountant",
+              created_at: "2025-01-15 10:00",
+            },
+            {
+              id: 5,
+              date: "2025-01-20",
+              category: "Fidya",
+              donor_name: "Malik Pervaiz",
+              amount: 30000,
+              payment_method: "Online",
+              receipt_number: "REC-2025-005",
+              notes: "Fidya payment",
+              created_by: "admin",
+              created_at: "2025-01-20 16:00",
+            },
+            {
+              id: 6,
+              date: "2025-02-02",
+              category: "Kaffarah",
+              donor_name: "Ahmed Khan",
+              amount: 45000,
+              payment_method: "Cash",
+              receipt_number: "REC-2025-006",
+              notes: "",
+              created_by: "admin",
+              created_at: "2025-02-02 09:30",
+            },
+            {
+              id: 7,
+              date: "2025-02-10",
+              category: "Monthly Donation",
+              donor_name: "Haji Abdul Rasheed",
+              amount: 50000,
+              payment_method: "Cash",
+              receipt_number: "REC-2025-007",
+              notes: "Feb donation",
+              created_by: "admin",
+              created_at: "2025-02-10 09:00",
+            },
+            {
+              id: 8,
+              date: "2025-02-15",
+              category: "Zakaat",
+              donor_name: "Engineer Usman",
+              amount: 200000,
+              payment_method: "Bank Transfer",
+              receipt_number: "REC-2025-008",
+              notes: "",
+              created_by: "accountant",
+              created_at: "2025-02-15 11:00",
+            },
+          ],
+          expenses: [
+            {
+              id: 1,
+              date: "2025-01-06",
+              category: "Utilities",
+              vendor: "K-Electric",
+              amount: 18000,
+              payment_method: "Bank Transfer",
+              bill_number: "BILL-001",
+              description: "Electricity bill Jan",
+              approved_by: "admin",
+              created_at: "2025-01-06 10:00",
+            },
+            {
+              id: 2,
+              date: "2025-01-07",
+              category: "Groceries",
+              vendor: "Al-Madina Store",
+              amount: 35000,
+              payment_method: "Cash",
+              bill_number: "BILL-002",
+              description: "Monthly grocery supplies",
+              approved_by: "admin",
+              created_at: "2025-01-07 11:00",
+            },
+            {
+              id: 3,
+              date: "2025-01-12",
+              category: "Salaries",
+              vendor: "Staff",
+              amount: 150000,
+              payment_method: "Bank Transfer",
+              bill_number: "SAL-001",
+              description: "Jan staff salaries",
+              approved_by: "admin",
+              created_at: "2025-01-12 09:00",
+            },
+            {
+              id: 4,
+              date: "2025-01-18",
+              category: "Maintenance",
+              vendor: "Rehman Electricals",
+              amount: 12000,
+              payment_method: "Cash",
+              bill_number: "BILL-003",
+              description: "Electrical repairs",
+              approved_by: "admin",
+              created_at: "2025-01-18 14:00",
+            },
+            {
+              id: 5,
+              date: "2025-01-25",
+              category: "Stationery",
+              vendor: "Pak Books",
+              amount: 8500,
+              payment_method: "Cash",
+              bill_number: "BILL-004",
+              description: "Books and pens",
+              approved_by: "accountant",
+              created_at: "2025-01-25 15:00",
+            },
+            {
+              id: 6,
+              date: "2025-02-05",
+              category: "Utilities",
+              vendor: "SNGPL",
+              amount: 9500,
+              payment_method: "Bank Transfer",
+              bill_number: "BILL-005",
+              description: "Gas bill Feb",
+              approved_by: "admin",
+              created_at: "2025-02-05 10:00",
+            },
+            {
+              id: 7,
+              date: "2025-02-12",
+              category: "Salaries",
+              vendor: "Staff",
+              amount: 150000,
+              payment_method: "Bank Transfer",
+              bill_number: "SAL-002",
+              description: "Feb staff salaries",
+              approved_by: "admin",
+              created_at: "2025-02-12 09:00",
+            },
+          ],
+          inventory: [
+            {
+              id: 1,
+              item_name: "Quran Majeed",
+              category: "Books",
+              quantity: 120,
+              unit_price: 450,
+              reorder_level: 20,
+              supplier: "Islamic Publishers",
+              last_updated: "2025-01-15",
+            },
+            {
+              id: 2,
+              item_name: "Hadith Collection (Bukhari)",
+              category: "Books",
+              quantity: 35,
+              unit_price: 1200,
+              reorder_level: 10,
+              supplier: "Dar-us-Salam",
+              last_updated: "2025-01-10",
+            },
+            {
+              id: 3,
+              item_name: "Notebooks (200 pages)",
+              category: "Stationery",
+              quantity: 500,
+              unit_price: 80,
+              reorder_level: 100,
+              supplier: "Paper House",
+              last_updated: "2025-01-20",
+            },
+            {
+              id: 4,
+              item_name: "Ball Pens (Pack of 10)",
+              category: "Stationery",
+              quantity: 200,
+              unit_price: 150,
+              reorder_level: 50,
+              supplier: "Paper House",
+              last_updated: "2025-01-20",
+            },
+            {
+              id: 5,
+              item_name: "Tajweed Books",
+              category: "Islamic Literature",
+              quantity: 8,
+              unit_price: 350,
+              reorder_level: 15,
+              supplier: "Maktaba Qudusia",
+              last_updated: "2025-01-05",
+            },
+            {
+              id: 6,
+              item_name: "Prayer Mats",
+              category: "Supplies",
+              quantity: 45,
+              unit_price: 600,
+              reorder_level: 10,
+              supplier: "Madina Traders",
+              last_updated: "2025-02-01",
+            },
+            {
+              id: 7,
+              item_name: "Whiteboards",
+              category: "Equipment",
+              quantity: 6,
+              unit_price: 3500,
+              reorder_level: 2,
+              supplier: "Office Planet",
+              last_updated: "2025-01-08",
+            },
+            {
+              id: 8,
+              item_name: "Markers (Pack of 4)",
+              category: "Stationery",
+              quantity: 80,
+              unit_price: 220,
+              reorder_level: 30,
+              supplier: "Paper House",
+              last_updated: "2025-02-05",
+            },
+          ],
+          donors: [
+            {
+              id: 1,
+              name: "Haji Abdul Rasheed",
+              phone: "0300-1111111",
+              email: "rasheed@mail.com",
+              type: "Recurring",
+              total: 100000,
+              last_date: "2025-02-10",
+            },
+            {
+              id: 2,
+              name: "Dr. Farhan Ali",
+              phone: "0301-2222222",
+              email: "farhan@mail.com",
+              type: "Annual",
+              total: 120000,
+              last_date: "2025-01-08",
+            },
+            {
+              id: 3,
+              name: "Mrs. Ayesha Siddiqui",
+              phone: "0302-3333333",
+              email: "ayesha@mail.com",
+              type: "One-time",
+              total: 25000,
+              last_date: "2025-01-10",
+            },
+            {
+              id: 4,
+              name: "Malik Pervaiz",
+              phone: "0303-4444444",
+              email: "pervaiz@mail.com",
+              type: "One-time",
+              total: 30000,
+              last_date: "2025-01-20",
+            },
+            {
+              id: 5,
+              name: "Engineer Usman",
+              phone: "0304-5555555",
+              email: "usman@mail.com",
+              type: "Annual",
+              total: 200000,
+              last_date: "2025-02-15",
+            },
+            {
+              id: 6,
+              name: "Ahmed Khan",
+              phone: "0305-6666666",
+              email: "ahmed@mail.com",
+              type: "One-time",
+              total: 45000,
+              last_date: "2025-02-02",
+            },
+          ],
+          employees: [
+            {
+              id: 1,
+              name: "Maulana Abdur Rahman",
+              role: "Head Teacher",
+              base_salary: 45000,
+              allowances: 5000,
+              deductions: 0,
+              status: "Active",
+            },
+            {
+              id: 2,
+              name: "Hafiz Zubair",
+              role: "Quran Teacher",
+              base_salary: 35000,
+              allowances: 3000,
+              deductions: 0,
+              status: "Active",
+            },
+            {
+              id: 3,
+              name: "Qari Imran",
+              role: "Tajweed Teacher",
+              base_salary: 32000,
+              allowances: 3000,
+              deductions: 0,
+              status: "Active",
+            },
+            {
+              id: 4,
+              name: "Muhammad Asif",
+              role: "Admin Staff",
+              base_salary: 25000,
+              allowances: 2000,
+              deductions: 1000,
+              status: "Active",
+            },
+            {
+              id: 5,
+              name: "Riaz Ahmed",
+              role: "Caretaker",
+              base_salary: 20000,
+              allowances: 2000,
+              deductions: 0,
+              status: "Active",
+            },
+          ],
+          budgets: [
+            { category: "Utilities", amount: 30000 },
+            { category: "Groceries", amount: 40000 },
+            { category: "Salaries", amount: 160000 },
+            { category: "Maintenance", amount: 20000 },
+            { category: "Stationery", amount: 15000 },
+          ],
+          audit: [],
+        };
+
+        let nextIds = {
+          income: 9,
+          expenses: 8,
+          inventory: 9,
+          donors: 7,
+          employees: 6,
+          users: 5,
+        };
+
+        // ---- Utility ----
+        function fmt(n) {
+          return Number(n).toLocaleString("en-PK");
+        }
+        function today() {
+          return new Date().toISOString().split("T")[0];
+        }
+        function now() {
+          return new Date().toISOString().replace("T", " ").substring(0, 16);
+        }
+        function genReceipt() {
+          return "REC-" + Date.now().toString(36).toUpperCase();
+        }
+        function escapeHtml(s) {
+          const d = document.createElement("div");
+          d.textContent = s;
+          return d.innerHTML;
+        }
+
+        function toast(msg, type) {
+          type = type || "success";
+          const t = document.createElement("div");
+          t.className = "toast toast-" + type;
+          const icons = {
+            success: "check-circle",
+            error: "exclamation-circle",
+            warning: "exclamation-triangle",
+            info: "info-circle",
+          };
+          t.innerHTML =
+            '<i class="fas fa-' + icons[type] + '"></i>' + escapeHtml(msg);
+          document.getElementById("toastContainer").appendChild(t);
+          setTimeout(() => {
+            t.style.opacity = "0";
+            setTimeout(() => t.remove(), 300);
+          }, 3500);
+        }
+
+        function addAudit(action, detail) {
+          DB.audit.unshift({
+            time: now(),
+            user: currentUser ? currentUser.full_name : "System",
+            action: action,
+            detail: detail,
+          });
+          if (DB.audit.length > 200) {
+            DB.audit.length = 200;
+          }
+        }
+
+        function canAccess(requiredRoles) {
+          if (!currentUser) {
+            return false;
+          }
+          if (requiredRoles.indexOf(currentUser.role) !== -1) {
+            return true;
+          }
+          return currentUser.role === "admin";
+        }
+
+        // ---- Dark Mode ----
+        function initDarkMode() {
+          if (
+            window.matchMedia &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches
+          ) {
+            document.documentElement.classList.add("dark");
+          }
+          window
+            .matchMedia("(prefers-color-scheme: dark)")
+            .addEventListener("change", function (e) {
+              if (e.matches) {
+                document.documentElement.classList.add("dark");
+              } else {
+                document.documentElement.classList.remove("dark");
+              }
+            });
+        }
+
+        // ---- Auth ----
+        function login() {
+          const u = document.getElementById("loginUser").value.trim();
+          const p = document.getElementById("loginPass").value;
+          const user = DB.users.find(function (x) {
+            return x.username === u && x.password_hash === p && x.is_active;
+          });
+          if (!user) {
+            toast("Invalid credentials", "error");
+            return;
+          }
+          currentUser = user;
+          document.getElementById("loginScreen").style.display = "none";
+          document.getElementById("appContainer").classList.add("active");
+          document.getElementById("userName").textContent = user.full_name;
+          const roleLabels = {
+            admin: "Administrator",
+            accountant: "Accountant",
+            inventory: "Inventory Manager",
+            viewer: "Trustee (View-only)",
+          };
+          document.getElementById("userRole").textContent =
+            roleLabels[user.role] || user.role;
+          document.getElementById("userAvatar").textContent =
+            user.full_name.charAt(0);
+          if (user.role !== "admin") {
+            document.getElementById("navUsers").style.display = "none";
+          }
+          addAudit("Login", user.full_name + " logged in");
+          refreshAll();
+          toast("Welcome, " + user.full_name + "!");
+        }
+
+        function logout() {
+          addAudit("Logout", currentUser.full_name + " logged out");
+          currentUser = null;
+          document.getElementById("loginScreen").style.display = "flex";
+          document.getElementById("appContainer").classList.remove("active");
+          document.getElementById("loginUser").value = "";
+          document.getElementById("loginPass").value = "";
+        }
+
+        // ---- Navigation ----
+        function navigate(page) {
+          currentPage = page;
+          document.querySelectorAll(".page-section").forEach(function (s) {
+            s.classList.remove("active");
+          });
+          document.querySelectorAll(".nav-item").forEach(function (n) {
+            n.classList.remove("active");
+          });
+          const pageEl = document.getElementById("page-" + page);
+          if (pageEl) {
+            pageEl.classList.add("active");
+          }
+          const navEl = document.querySelector(
+            '.nav-item[data-page="' + page + '"]',
+          );
+          if (navEl) {
+            navEl.classList.add("active");
+          }
+          const titles = {
+            dashboard: "Dashboard",
+            income: "Income Management",
+            expenses: "Expense Management",
+            donors: "Donor Management",
+            budget: "Budget Allocation",
+            inventory: "Inventory Management",
+            salary: "Salary Processing",
+            reports: "Reports & Analytics",
+            audit: "Audit Trail",
+            users: "User Management",
+          };
+          document.getElementById("pageTitle").textContent =
+            titles[page] || page;
+          refreshPage(page);
+          // close mobile sidebar
+          document.getElementById("sidebar").classList.remove("open");
+        }
+
+        function refreshPage(page) {
+          const fn = {
+            dashboard: renderDashboard,
+            income: renderIncome,
+            expenses: renderExpenses,
+            donors: renderDonors,
+            budget: renderBudget,
+            inventory: renderInventory,
+            salary: renderSalary,
+            reports: renderReports,
+            audit: renderAudit,
+            users: renderUsers,
+          };
+          if (fn[page]) {
+            fn[page]();
+          }
+        }
+        function refreshAll() {
+          refreshPage(currentPage);
+        }
+
+        // ---- Dashboard ----
+        function renderDashboard() {
+          const totalIncome = DB.income.reduce(function (s, r) {
+            return s + r.amount;
+          }, 0);
+          const totalExpense = DB.expenses.reduce(function (s, r) {
+            return s + r.amount;
+          }, 0);
+          const balance = totalIncome - totalExpense;
+          const invValue = DB.inventory.reduce(function (s, r) {
+            return s + r.quantity * r.unit_price;
+          }, 0);
+          const lowStock = DB.inventory.filter(function (r) {
+            return r.quantity <= r.reorder_level;
+          }).length;
+
+          document.getElementById("dashStats").innerHTML =
+            '<div class="stat-card income"><div class="stat-label">Total Income</div><div class="stat-value" style="color:var(--success)">PKR ' +
+            fmt(totalIncome) +
+            '</div><div class="stat-sub">' +
+            DB.income.length +
+            ' transactions</div><div class="stat-icon"><i class="fas fa-arrow-down"></i></div></div>' +
+            '<div class="stat-card expense"><div class="stat-label">Total Expenses</div><div class="stat-value" style="color:var(--danger)">PKR ' +
+            fmt(totalExpense) +
+            '</div><div class="stat-sub">' +
+            DB.expenses.length +
+            ' transactions</div><div class="stat-icon"><i class="fas fa-arrow-up"></i></div></div>' +
+            '<div class="stat-card balance"><div class="stat-label">Current Balance</div><div class="stat-value" style="color:var(--gold-dark)">PKR ' +
+            fmt(balance) +
+            '</div><div class="stat-sub">As of today</div><div class="stat-icon"><i class="fas fa-wallet"></i></div></div>' +
+            '<div class="stat-card inventory"><div class="stat-label">Inventory Value</div><div class="stat-value" style="color:var(--info)">PKR ' +
+            fmt(invValue) +
+            '</div><div class="stat-sub">' +
+            (lowStock > 0
+              ? '<span style="color:var(--danger)">' +
+                lowStock +
+                " low stock items</span>"
+              : "All items in stock") +
+            '</div><div class="stat-icon"><i class="fas fa-box"></i></div></div>';
+
+          // Recent transactions
+          const all = DB.income
+            .map(function (r) {
+              return {
+                date: r.date,
+                type: "Income",
+                category: r.category,
+                desc: r.donor_name,
+                amount: r.amount,
+                cls: "income",
+              };
+            })
+            .concat(
+              DB.expenses.map(function (r) {
+                return {
+                  date: r.date,
+                  type: "Expense",
+                  category: r.category,
+                  desc: r.vendor + " - " + r.description,
+                  amount: r.amount,
+                  cls: "expense",
+                };
+              }),
+            );
+          all.sort(function (a, b) {
+            return b.date.localeCompare(a.date);
+          });
+          const recent = all.slice(0, 10);
+          const tbody = document.querySelector("#recentTable tbody");
+          tbody.innerHTML = recent
+            .map(function (r) {
+              return (
+                "<tr><td>" +
+                r.date +
+                '</td><td><span class="badge badge-' +
+                r.cls +
+                '">' +
+                r.type +
+                "</span></td><td>" +
+                escapeHtml(r.category) +
+                "</td><td>" +
+                escapeHtml(r.desc) +
+                '</td><td style="font-weight:600;color:var(--' +
+                (r.cls === "income" ? "success" : "danger") +
+                ')">' +
+                (r.cls === "income" ? "+" : "-") +
+                " PKR " +
+                fmt(r.amount) +
+                "</td></tr>"
+              );
+            })
+            .join("");
+
+          renderDashboardCharts();
+        }
+
+        function renderDashboardCharts() {
+          // Monthly overview
+          const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const incByMonth = new Array(12).fill(0);
+          const expByMonth = new Array(12).fill(0);
+          DB.income.forEach(function (r) {
+            const m = new Date(r.date).getMonth();
+            incByMonth[m] += r.amount;
+          });
+          DB.expenses.forEach(function (r) {
+            const m = new Date(r.date).getMonth();
+            expByMonth[m] += r.amount;
+          });
+          const isDark = document.documentElement.classList.contains("dark");
+          const gridColor = isDark
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(0,0,0,0.06)";
+          const textColor = isDark ? "#a8a090" : "#5a5a5a";
+
+          if (charts.overview) {
+            charts.overview.destroy();
+          }
+          charts.overview = new Chart(
+            document.getElementById("chartOverview"),
+            {
+              type: "bar",
+              data: {
+                labels: months,
+                datasets: [
+                  {
+                    label: "Income",
+                    data: incByMonth,
+                    backgroundColor: "rgba(26,139,76,0.7)",
+                    borderRadius: 6,
+                  },
+                  {
+                    label: "Expenses",
+                    data: expByMonth,
+                    backgroundColor: "rgba(192,57,43,0.7)",
+                    borderRadius: 6,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { labels: { color: textColor } } },
+                scales: {
+                  x: {
+                    ticks: { color: textColor },
+                    grid: { color: gridColor },
+                  },
+                  y: {
+                    ticks: {
+                      color: textColor,
+                      callback: function (v) {
+                        return "PKR " + fmt(v);
+                      },
+                    },
+                    grid: { color: gridColor },
+                  },
+                },
+              },
+            },
+          );
+
+          // Category pie
+          const catMap = {};
+          DB.income.forEach(function (r) {
+            catMap[r.category] = (catMap[r.category] || 0) + r.amount;
+          });
+          const catLabels = Object.keys(catMap);
+          const catValues = catLabels.map(function (c) {
+            return catMap[c];
+          });
+          const pieColors = [
+            "#0d6b3f",
+            "#c9a84c",
+            "#2471a3",
+            "#8e44ad",
+            "#d35400",
+            "#16a085",
+          ];
+
+          if (charts.categories) {
+            charts.categories.destroy();
+          }
+          charts.categories = new Chart(
+            document.getElementById("chartCategories"),
+            {
+              type: "doughnut",
+              data: {
+                labels: catLabels,
+                datasets: [
+                  {
+                    data: catValues,
+                    backgroundColor: pieColors.slice(0, catLabels.length),
+                    borderWidth: 0,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: "right",
+                    labels: { color: textColor, padding: 12 },
+                  },
+                },
+              },
+            },
+          );
+        }
+
+        // ---- Income ----
+        function renderIncome() {
+          const tbody = document.querySelector("#incomeTable tbody");
+          tbody.innerHTML = DB.income
+            .map(function (r, i) {
+              const canEdit = canAccess(["admin", "accountant"]);
+              return (
+                "<tr><td>" +
+                (i + 1) +
+                "</td><td>" +
+                r.date +
+                '</td><td><span class="badge badge-income">' +
+                escapeHtml(r.category) +
+                "</span></td><td>" +
+                escapeHtml(r.donor_name) +
+                '</td><td style="font-weight:600">PKR ' +
+                fmt(r.amount) +
+                "</td><td>" +
+                r.payment_method +
+                '</td><td style="font-size:11px">' +
+                r.receipt_number +
+                "</td><td>" +
+                (canEdit
+                  ? '<button class="btn btn-sm btn-outline" onclick="MMS.editRecord(\'income\',' +
+                    r.id +
+                    ')"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-danger" onclick="MMS.deleteRecord(\'income\',' +
+                    r.id +
+                    ')"><i class="fas fa-trash"></i></button>'
+                  : "-") +
+                "</td></tr>"
+              );
+            })
+            .join("");
+        }
+
+        // ---- Expenses ----
+        function renderExpenses() {
+          const tbody = document.querySelector("#expenseTable tbody");
+          tbody.innerHTML = DB.expenses
+            .map(function (r, i) {
+              const canEdit = canAccess(["admin", "accountant"]);
+              return (
+                "<tr><td>" +
+                (i + 1) +
+                "</td><td>" +
+                r.date +
+                '</td><td><span class="badge badge-expense">' +
+                escapeHtml(r.category) +
+                "</span></td><td>" +
+                escapeHtml(r.vendor) +
+                '</td><td style="font-weight:600">PKR ' +
+                fmt(r.amount) +
+                "</td><td>" +
+                r.payment_method +
+                "</td><td>" +
+                r.bill_number +
+                "</td><td>" +
+                (canEdit
+                  ? '<button class="btn btn-sm btn-outline" onclick="MMS.editRecord(\'expense\',' +
+                    r.id +
+                    ')"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-danger" onclick="MMS.deleteRecord(\'expense\',' +
+                    r.id +
+                    ')"><i class="fas fa-trash"></i></button>'
+                  : "-") +
+                "</td></tr>"
+              );
+            })
+            .join("");
+        }
+
+        // ---- Donors ----
+        function renderDonors() {
+          const tbody = document.querySelector("#donorTable tbody");
+          tbody.innerHTML = DB.donors
+            .map(function (r, i) {
+              return (
+                "<tr><td>" +
+                (i + 1) +
+                "</td><td>" +
+                escapeHtml(r.name) +
+                "</td><td>" +
+                r.phone +
+                "</td><td>" +
+                r.email +
+                '</td><td><span class="badge badge-info">' +
+                r.type +
+                '</span></td><td style="font-weight:600">PKR ' +
+                fmt(r.total) +
+                "</td><td>" +
+                r.last_date +
+                '</td><td><button class="btn btn-sm btn-outline" onclick="MMS.editRecord(\'donor\',' +
+                r.id +
+                ')"><i class="fas fa-edit"></i></button></td></tr>'
+              );
+            })
+            .join("");
+        }
+
+        // ---- Budget ----
+        function renderBudget() {
+          const curMonth = new Date().getMonth();
+          const tbody = document.querySelector("#budgetTable tbody");
+          tbody.innerHTML = DB.budgets
+            .map(function (b) {
+              const actual = DB.expenses
+                .filter(function (e) {
+                  return (
+                    e.category === b.category &&
+                    new Date(e.date).getMonth() === curMonth
+                  );
+                })
+                .reduce(function (s, e) {
+                  return s + e.amount;
+                }, 0);
+              const remaining = b.amount - actual;
+              const pct =
+                b.amount > 0 ? Math.round((actual / b.amount) * 100) : 0;
+              let statusCls = "badge-income";
+              let statusText = "On Track";
+              if (pct > 100) {
+                statusCls = "badge-expense";
+                statusText = "Over Budget!";
+              } else if (pct > 80) {
+                statusCls = "badge-warning";
+                statusText = "Caution";
+              }
+              return (
+                "<tr><td>" +
+                b.category +
+                "</td><td>PKR " +
+                fmt(b.amount) +
+                "</td><td>PKR " +
+                fmt(actual) +
+                '</td><td style="color:' +
+                (remaining < 0 ? "var(--danger)" : "var(--success)") +
+                '">PKR ' +
+                fmt(remaining) +
+                '</td><td><div style="background:var(--bg);border-radius:4px;overflow:hidden;height:8px;"><div style="height:100%;width:' +
+                Math.min(pct, 100) +
+                "%;background:" +
+                (pct > 100
+                  ? "var(--danger)"
+                  : pct > 80
+                    ? "var(--warning)"
+                    : "var(--success)") +
+                ';border-radius:4px;"></div></div><span style="font-size:11px">' +
+                pct +
+                '%</span></td><td><span class="badge ' +
+                statusCls +
+                '">' +
+                statusText +
+                "</span></td></tr>"
+              );
+            })
+            .join("");
+        }
+
+        // ---- Inventory ----
+        function renderInventory() {
+          const totalVal = DB.inventory.reduce(function (s, r) {
+            return s + r.quantity * r.unit_price;
+          }, 0);
+          const totalItems = DB.inventory.reduce(function (s, r) {
+            return s + r.quantity;
+          }, 0);
+          const lowStock = DB.inventory.filter(function (r) {
+            return r.quantity <= r.reorder_level;
+          });
+          const cats = [
+            ...new Set(
+              DB.inventory.map(function (r) {
+                return r.category;
+              }),
+            ),
+          ];
+
+          document.getElementById("inventoryStats").innerHTML =
+            '<div class="stat-card inventory"><div class="stat-label">Total Items</div><div class="stat-value">' +
+            fmt(totalItems) +
+            '</div><div class="stat-sub">' +
+            DB.inventory.length +
+            ' SKUs</div><div class="stat-icon"><i class="fas fa-cubes"></i></div></div>' +
+            '<div class="stat-card balance"><div class="stat-label">Total Value</div><div class="stat-value">PKR ' +
+            fmt(totalVal) +
+            '</div><div class="stat-icon"><i class="fas fa-coins"></i></div></div>' +
+            '<div class="stat-card ' +
+            (lowStock.length > 0 ? "expense" : "income") +
+            '"><div class="stat-label">Low Stock Alerts</div><div class="stat-value">' +
+            lowStock.length +
+            '</div><div class="stat-sub">' +
+            (lowStock.length > 0 ? "Needs reorder" : "All sufficient") +
+            '</div><div class="stat-icon"><i class="fas fa-exclamation-triangle"></i></div></div>' +
+            '<div class="stat-card income"><div class="stat-label">Categories</div><div class="stat-value">' +
+            cats.length +
+            '</div><div class="stat-icon"><i class="fas fa-tags"></i></div></div>';
+
+          const tbody = document.querySelector("#inventoryTable tbody");
+          const canEdit = canAccess(["admin", "inventory"]);
+          tbody.innerHTML = DB.inventory
+            .map(function (r, i) {
+              const isLow = r.quantity <= r.reorder_level;
+              return (
+                "<tr><td>" +
+                (i + 1) +
+                "</td><td>" +
+                escapeHtml(r.item_name) +
+                "</td><td>" +
+                r.category +
+                '</td><td style="font-weight:600;' +
+                (isLow ? "color:var(--danger)" : "") +
+                '">' +
+                r.quantity +
+                "</td><td>PKR " +
+                fmt(r.unit_price) +
+                '</td><td style="font-weight:600">PKR ' +
+                fmt(r.quantity * r.unit_price) +
+                "</td><td>" +
+                r.reorder_level +
+                "</td><td>" +
+                escapeHtml(r.supplier) +
+                '</td><td><span class="badge ' +
+                (isLow ? "badge-expense" : "badge-income") +
+                '">' +
+                (isLow ? "Low Stock" : "In Stock") +
+                "</span></td><td>" +
+                (canEdit
+                  ? '<button class="btn btn-sm btn-outline" onclick="MMS.editRecord(\'inventoryItem\',' +
+                    r.id +
+                    ')"><i class="fas fa-edit"></i></button> <button class="btn btn-sm btn-danger" onclick="MMS.deleteRecord(\'inventoryItem\',' +
+                    r.id +
+                    ')"><i class="fas fa-trash"></i></button>'
+                  : "-") +
+                "</td></tr>"
+              );
+            })
+            .join("");
+        }
+
+        // ---- Salary ----
+        function renderSalary() {
+          const tbody = document.querySelector("#salaryTable tbody");
+          tbody.innerHTML = DB.employees
+            .map(function (r, i) {
+              const net = r.base_salary + r.allowances - r.deductions;
+              return (
+                "<tr><td>" +
+                (i + 1) +
+                "</td><td>" +
+                escapeHtml(r.name) +
+                "</td><td>" +
+                r.role +
+                "</td><td>PKR " +
+                fmt(r.base_salary) +
+                "</td><td>PKR " +
+                fmt(r.allowances) +
+                "</td><td>PKR " +
+                fmt(r.deductions) +
+                '</td><td style="font-weight:700">PKR ' +
+                fmt(net) +
+                '</td><td><span class="badge badge-income">' +
+                r.status +
+                '</span></td><td><button class="btn btn-sm btn-outline" onclick="MMS.editRecord(\'employee\',' +
+                r.id +
+                ')"><i class="fas fa-edit"></i></button></td></tr>'
+              );
+            })
+            .join("");
+        }
+
+        function processSalaries() {
+          if (!canAccess(["admin"])) {
+            toast("Only Admin can process salaries", "error");
+            return;
+          }
+          const monthNames = [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December",
+          ];
+          const month = monthNames[new Date().getMonth()];
+          let total = 0;
+          DB.employees.forEach(function (emp) {
+            if (emp.status === "Active") {
+              const net = emp.base_salary + emp.allowances - emp.deductions;
+              total += net;
+            }
+          });
+          DB.expenses.push({
+            id: nextIds.expenses++,
+            date: today(),
+            category: "Salaries",
+            vendor: "Staff",
+            amount: total,
+            payment_method: "Bank Transfer",
+            bill_number: "SAL-" + Date.now().toString(36).toUpperCase(),
+            description: month + " salaries processed",
+            approved_by: currentUser.username,
+            created_at: now(),
+          });
+          addAudit(
+            "Salary Processing",
+            month + " salaries processed: PKR " + fmt(total),
+          );
+          toast(month + " salaries processed: PKR " + fmt(total));
+          renderSalary();
+        }
+
+        // ---- Reports ----
+        function renderReports() {
+          const fromEl = document.getElementById("reportFrom");
+          const toEl = document.getElementById("reportTo");
+          if (!fromEl.value) {
+            fromEl.value = "2025-01-01";
+          }
+          if (!toEl.value) {
+            toEl.value = today();
+          }
+          generateReport();
+        }
+
+        function generateReport() {
+          const from = document.getElementById("reportFrom").value;
+          const to = document.getElementById("reportTo").value;
+          const incFiltered = DB.income.filter(function (r) {
+            return r.date >= from && r.date <= to;
+          });
+          const expFiltered = DB.expenses.filter(function (r) {
+            return r.date >= from && r.date <= to;
+          });
+          const totalInc = incFiltered.reduce(function (s, r) {
+            return s + r.amount;
+          }, 0);
+          const totalExp = expFiltered.reduce(function (s, r) {
+            return s + r.amount;
+          }, 0);
+          const net = totalInc - totalExp;
+
+          document.getElementById("reportStats").innerHTML =
+            '<div class="stat-card income"><div class="stat-label">Period Income</div><div class="stat-value" style="color:var(--success)">PKR ' +
+            fmt(totalInc) +
+            '</div><div class="stat-sub">' +
+            incFiltered.length +
+            " entries</div></div>" +
+            '<div class="stat-card expense"><div class="stat-label">Period Expenses</div><div class="stat-value" style="color:var(--danger)">PKR ' +
+            fmt(totalExp) +
+            '</div><div class="stat-sub">' +
+            expFiltered.length +
+            " entries</div></div>" +
+            '<div class="stat-card ' +
+            (net >= 0 ? "balance" : "expense") +
+            '"><div class="stat-label">Net Surplus / Deficit</div><div class="stat-value" style="color:' +
+            (net >= 0 ? "var(--success)" : "var(--danger)") +
+            '">PKR ' +
+            fmt(net) +
+            "</div></div>";
+
+          // Charts
+          const months = [
+            "Jan",
+            "Feb",
+            "Mar",
+            "Apr",
+            "May",
+            "Jun",
+            "Jul",
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec",
+          ];
+          const incM = new Array(12).fill(0);
+          const expM = new Array(12).fill(0);
+          incFiltered.forEach(function (r) {
+            incM[new Date(r.date).getMonth()] += r.amount;
+          });
+          expFiltered.forEach(function (r) {
+            expM[new Date(r.date).getMonth()] += r.amount;
+          });
+          const isDark = document.documentElement.classList.contains("dark");
+          const textColor = isDark ? "#a8a090" : "#5a5a5a";
+          const gridColor = isDark
+            ? "rgba(255,255,255,0.08)"
+            : "rgba(0,0,0,0.06)";
+
+          if (charts.report) {
+            charts.report.destroy();
+          }
+          charts.report = new Chart(document.getElementById("chartReport"), {
+            type: "line",
+            data: {
+              labels: months,
+              datasets: [
+                {
+                  label: "Income",
+                  data: incM,
+                  borderColor: "#1a8b4c",
+                  backgroundColor: "rgba(26,139,76,0.1)",
+                  fill: true,
+                  tension: 0.3,
+                },
+                {
+                  label: "Expenses",
+                  data: expM,
+                  borderColor: "#c0392b",
+                  backgroundColor: "rgba(192,57,43,0.1)",
+                  fill: true,
+                  tension: 0.3,
+                },
+              ],
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { labels: { color: textColor } } },
+              scales: {
+                x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                y: {
+                  ticks: {
+                    color: textColor,
+                    callback: function (v) {
+                      return "PKR " + fmt(v);
+                    },
+                  },
+                  grid: { color: gridColor },
+                },
+              },
+            },
+          });
+
+          // Expense breakdown
+          const eCatMap = {};
+          expFiltered.forEach(function (r) {
+            eCatMap[r.category] = (eCatMap[r.category] || 0) + r.amount;
+          });
+          const eCatLabels = Object.keys(eCatMap);
+          const eCatVals = eCatLabels.map(function (c) {
+            return eCatMap[c];
+          });
+          const pieColors2 = [
+            "#c0392b",
+            "#d35400",
+            "#8e44ad",
+            "#2471a3",
+            "#16a085",
+            "#f39c12",
+          ];
+          if (charts.expBreak) {
+            charts.expBreak.destroy();
+          }
+          charts.expBreak = new Chart(
+            document.getElementById("chartExpBreak"),
+            {
+              type: "doughnut",
+              data: {
+                labels: eCatLabels,
+                datasets: [
+                  {
+                    data: eCatVals,
+                    backgroundColor: pieColors2.slice(0, eCatLabels.length),
+                    borderWidth: 0,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    position: "right",
+                    labels: { color: textColor, padding: 12 },
+                  },
+                },
+              },
+            },
+          );
+
+          // Ledger
+          const ledger = incFiltered
+            .map(function (r) {
+              return {
+                date: r.date,
+                type: "Income",
+                category: r.category,
+                desc: r.donor_name,
+                inc: r.amount,
+                exp: 0,
+              };
+            })
+            .concat(
+              expFiltered.map(function (r) {
+                return {
+                  date: r.date,
+                  type: "Expense",
+                  category: r.category,
+                  desc: r.vendor + " - " + r.description,
+                  inc: 0,
+                  exp: r.amount,
+                };
+              }),
+            );
+          ledger.sort(function (a, b) {
+            return a.date.localeCompare(b.date);
+          });
+          let runBal = 0;
+          const tbody = document.querySelector("#reportLedger tbody");
+          tbody.innerHTML = ledger
+            .map(function (r) {
+              runBal += r.inc - r.exp;
+              return (
+                "<tr><td>" +
+                r.date +
+                '</td><td><span class="badge badge-' +
+                (r.type === "Income" ? "income" : "expense") +
+                '">' +
+                r.type +
+                "</span></td><td>" +
+                escapeHtml(r.category) +
+                "</td><td>" +
+                escapeHtml(r.desc) +
+                '</td><td style="color:var(--success)">' +
+                (r.inc ? "PKR " + fmt(r.inc) : "-") +
+                '</td><td style="color:var(--danger)">' +
+                (r.exp ? "PKR " + fmt(r.exp) : "-") +
+                '</td><td style="font-weight:600">PKR ' +
+                fmt(runBal) +
+                "</td></tr>"
+              );
+            })
+            .join("");
+        }
+
+        // ---- PDF Export ----
+        function exportPDF() {
+          /* globals jspdf */
+          const { jsPDF } = jspdf;
+          const doc = new jsPDF();
+          // Header
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(10);
+          doc.text("Bismillahir Rahmanir Rahim", 105, 12, { align: "center" });
+          doc.setFontSize(16);
+          doc.setTextColor(13, 107, 63);
+          doc.text("Jamia Sayyidna Umar (RA)", 105, 22, { align: "center" });
+          doc.setFontSize(10);
+          doc.setTextColor(100);
+          doc.text("G-11/3 Islamabad | Financial Report", 105, 28, {
+            align: "center",
+          });
+          doc.setDrawColor(201, 168, 76);
+          doc.setLineWidth(0.5);
+          doc.line(20, 32, 190, 32);
+
+          const from = document.getElementById("reportFrom").value;
+          const to = document.getElementById("reportTo").value;
+          doc.setFontSize(11);
+          doc.setTextColor(0);
+          doc.text("Period: " + from + " to " + to, 20, 40);
+
+          // Summary
+          const incFiltered = DB.income.filter(function (r) {
+            return r.date >= from && r.date <= to;
+          });
+          const expFiltered = DB.expenses.filter(function (r) {
+            return r.date >= from && r.date <= to;
+          });
+          const totalInc = incFiltered.reduce(function (s, r) {
+            return s + r.amount;
+          }, 0);
+          const totalExp = expFiltered.reduce(function (s, r) {
+            return s + r.amount;
+          }, 0);
+          doc.setFont("helvetica", "bold");
+          doc.text("Total Income: PKR " + fmt(totalInc), 20, 50);
+          doc.text("Total Expenses: PKR " + fmt(totalExp), 20, 57);
+          doc.text("Net Balance: PKR " + fmt(totalInc - totalExp), 20, 64);
+
+          // Income table
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(12);
+          doc.setTextColor(13, 107, 63);
+          doc.text("Income Details", 20, 76);
+          doc.autoTable({
+            startY: 80,
+            head: [["Date", "Category", "Donor", "Amount", "Method"]],
+            body: incFiltered.map(function (r) {
+              return [
+                r.date,
+                r.category,
+                r.donor_name,
+                "PKR " + fmt(r.amount),
+                r.payment_method,
+              ];
+            }),
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [13, 107, 63] },
+          });
+
+          // Expense table
+          const y2 = doc.lastAutoTable.finalY + 12;
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(12);
+          doc.setTextColor(192, 57, 43);
+          doc.text("Expense Details", 20, y2);
+          doc.autoTable({
+            startY: y2 + 4,
+            head: [["Date", "Category", "Vendor", "Amount", "Description"]],
+            body: expFiltered.map(function (r) {
+              return [
+                r.date,
+                r.category,
+                r.vendor,
+                "PKR " + fmt(r.amount),
+                r.description,
+              ];
+            }),
+            styles: { fontSize: 8 },
+            headStyles: { fillColor: [192, 57, 43] },
+          });
+
+          // Footer
+          const pageCount = doc.getNumberOfPages();
+          for (let pg = 1; pg <= pageCount; pg++) {
+            doc.setPage(pg);
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text(
+              "Generated on " + now() + " | Page " + pg + "/" + pageCount,
+              105,
+              290,
+              { align: "center" },
+            );
+          }
+          doc.save("JMU_Financial_Report_" + from + "_to_" + to + ".pdf");
+          toast("PDF report downloaded");
+          addAudit(
+            "Report Export",
+            "PDF report exported for " + from + " to " + to,
+          );
+        }
+
+        // ---- Audit ----
+        function renderAudit() {
+          const el = document.getElementById("auditList");
+          if (DB.audit.length === 0) {
+            el.innerHTML =
+              '<p style="padding:20px;text-align:center;color:var(--text-secondary)">No activity logged yet.</p>';
+            return;
+          }
+          el.innerHTML = DB.audit
+            .slice(0, 50)
+            .map(function (a) {
+              return (
+                '<div class="audit-item"><div class="audit-icon"><i class="fas fa-' +
+                (a.action.indexOf("Login") !== -1
+                  ? "sign-in-alt"
+                  : a.action.indexOf("Added") !== -1
+                    ? "plus"
+                    : a.action.indexOf("Delete") !== -1
+                      ? "trash"
+                      : a.action.indexOf("Edit") !== -1
+                        ? "edit"
+                        : "cog") +
+                '"></i></div><div><strong>' +
+                escapeHtml(a.user) +
+                "</strong> &mdash; " +
+                escapeHtml(a.action) +
+                '<br><span style="font-size:12px;color:var(--text-secondary)">' +
+                escapeHtml(a.detail) +
+                '</span><br><span class="audit-time">' +
+                a.time +
+                "</span></div></div>"
+              );
+            })
+            .join("");
+        }
+
+        // ---- Users ----
+        function renderUsers() {
+          if (!canAccess(["admin"])) {
+            return;
+          }
+          const tbody = document.querySelector("#userTable tbody");
+          const roleLabels = {
+            admin: "Admin",
+            accountant: "Accountant",
+            inventory: "Inventory Mgr",
+            viewer: "Viewer",
+          };
+          tbody.innerHTML = DB.users
+            .map(function (r, i) {
+              return (
+                "<tr><td>" +
+                (i + 1) +
+                "</td><td>" +
+                escapeHtml(r.username) +
+                "</td><td>" +
+                escapeHtml(r.full_name) +
+                '</td><td><span class="badge badge-info">' +
+                (roleLabels[r.role] || r.role) +
+                "</span></td><td>" +
+                r.email +
+                "</td><td>" +
+                r.phone +
+                '</td><td><span class="badge ' +
+                (r.is_active ? "badge-income" : "badge-expense") +
+                '">' +
+                (r.is_active ? "Active" : "Inactive") +
+                '</span></td><td><button class="btn btn-sm btn-outline" onclick="MMS.editRecord(\'user\',' +
+                r.id +
+                ')"><i class="fas fa-edit"></i></button></td></tr>'
+              );
+            })
+            .join("");
+        }
+
+        // ---- Modals & Forms ----
+        function openModal(type, record) {
+          editingType = type;
+          editingId = record ? record.id : null;
+          const titles = {
+            income: "Income Entry",
+            expense: "Expense Entry",
+            donor: "Donor",
+            budget: "Budget Allocation",
+            inventoryItem: "Inventory Item",
+            employee: "Employee",
+            user: "User",
+          };
+          document.getElementById("modalTitle").textContent =
+            (record ? "Edit " : "Add ") + (titles[type] || type);
+          const body = document.getElementById("modalBody");
+          let html = '<div class="form-grid">';
+
+          if (type === "income") {
+            html += formField(
+              "Date",
+              "mDate",
+              "date",
+              record ? record.date : today(),
+            );
+            html += formSelect(
+              "Category",
+              "mCategory",
+              [
+                "Monthly Donation",
+                "Zakaat",
+                "Sadaqaat",
+                "Fees",
+                "Fidya",
+                "Kaffarah",
+                "Other",
+              ],
+              record ? record.category : "",
+            );
+            html += formField(
+              "Donor Name",
+              "mDonor",
+              "text",
+              record ? record.donor_name : "",
+            );
+            html += formField(
+              "Amount (PKR)",
+              "mAmount",
+              "number",
+              record ? record.amount : "",
+            );
+            html += formSelect(
+              "Payment Method",
+              "mMethod",
+              ["Cash", "Bank Transfer", "Online", "Cheque"],
+              record ? record.payment_method : "",
+            );
+            html += formField(
+              "Notes",
+              "mNotes",
+              "text",
+              record ? record.notes : "",
+            );
+          } else if (type === "expense") {
+            html += formField(
+              "Date",
+              "mDate",
+              "date",
+              record ? record.date : today(),
+            );
+            html += formSelect(
+              "Category",
+              "mCategory",
+              [
+                "Utilities",
+                "Salaries",
+                "Groceries",
+                "Maintenance",
+                "Stationery",
+                "Transport",
+                "Miscellaneous",
+              ],
+              record ? record.category : "",
+            );
+            html += formField(
+              "Vendor",
+              "mVendor",
+              "text",
+              record ? record.vendor : "",
+            );
+            html += formField(
+              "Amount (PKR)",
+              "mAmount",
+              "number",
+              record ? record.amount : "",
+            );
+            html += formSelect(
+              "Payment Method",
+              "mMethod",
+              ["Cash", "Bank Transfer", "Online", "Cheque"],
+              record ? record.payment_method : "",
+            );
+            html += formField(
+              "Bill Number",
+              "mBill",
+              "text",
+              record ? record.bill_number : "",
+            );
+            html += formField(
+              "Description",
+              "mDesc",
+              "text",
+              record ? record.description : "",
+            );
+          } else if (type === "donor") {
+            html += formField(
+              "Name",
+              "mName",
+              "text",
+              record ? record.name : "",
+            );
+            html += formField(
+              "Phone",
+              "mPhone",
+              "text",
+              record ? record.phone : "",
+            );
+            html += formField(
+              "Email",
+              "mEmail",
+              "email",
+              record ? record.email : "",
+            );
+            html += formSelect(
+              "Type",
+              "mType",
+              ["Recurring", "Annual", "One-time"],
+              record ? record.type : "",
+            );
+          } else if (type === "budget") {
+            html += formSelect(
+              "Category",
+              "mCategory",
+              [
+                "Utilities",
+                "Salaries",
+                "Groceries",
+                "Maintenance",
+                "Stationery",
+                "Transport",
+                "Miscellaneous",
+              ],
+              "",
+            );
+            html += formField("Monthly Budget (PKR)", "mAmount", "number", "");
+          } else if (type === "inventoryItem") {
+            html += formField(
+              "Item Name",
+              "mName",
+              "text",
+              record ? record.item_name : "",
+            );
+            html += formSelect(
+              "Category",
+              "mCategory",
+              [
+                "Books",
+                "Stationery",
+                "Islamic Literature",
+                "Supplies",
+                "Equipment",
+                "Other",
+              ],
+              record ? record.category : "",
+            );
+            html += formField(
+              "Quantity",
+              "mQty",
+              "number",
+              record ? record.quantity : "",
+            );
+            html += formField(
+              "Unit Price (PKR)",
+              "mPrice",
+              "number",
+              record ? record.unit_price : "",
+            );
+            html += formField(
+              "Reorder Level",
+              "mReorder",
+              "number",
+              record ? record.reorder_level : "",
+            );
+            html += formField(
+              "Supplier",
+              "mSupplier",
+              "text",
+              record ? record.supplier : "",
+            );
+          } else if (type === "employee") {
+            html += formField(
+              "Full Name",
+              "mName",
+              "text",
+              record ? record.name : "",
+            );
+            html += formField(
+              "Role",
+              "mRole",
+              "text",
+              record ? record.role : "",
+            );
+            html += formField(
+              "Base Salary (PKR)",
+              "mBase",
+              "number",
+              record ? record.base_salary : "",
+            );
+            html += formField(
+              "Allowances (PKR)",
+              "mAllow",
+              "number",
+              record ? record.allowances : 0,
+            );
+            html += formField(
+              "Deductions (PKR)",
+              "mDeduct",
+              "number",
+              record ? record.deductions : 0,
+            );
+            html += formSelect(
+              "Status",
+              "mStatus",
+              ["Active", "Inactive"],
+              record ? record.status : "Active",
+            );
+          } else if (type === "user") {
+            html += formField(
+              "Username",
+              "mUsername",
+              "text",
+              record ? record.username : "",
+            );
+            html += formField(
+              "Full Name",
+              "mFullName",
+              "text",
+              record ? record.full_name : "",
+            );
+            html += formField("Password", "mPassword", "password", "");
+            html += formSelect(
+              "Role",
+              "mUserRole",
+              ["admin", "accountant", "inventory", "viewer"],
+              record ? record.role : "viewer",
+            );
+            html += formField(
+              "Email",
+              "mEmail",
+              "email",
+              record ? record.email : "",
+            );
+            html += formField(
+              "Phone",
+              "mPhone",
+              "text",
+              record ? record.phone : "",
+            );
+          }
+          html += "</div>";
+          body.innerHTML = html;
+          document.getElementById("modalSave").onclick = saveModal;
+          document.getElementById("modalOverlay").classList.add("active");
+        }
+
+        function formField(label, id, type, value) {
+          return (
+            '<div class="form-group"><label>' +
+            label +
+            '</label><input type="' +
+            type +
+            '" id="' +
+            id +
+            '" value="' +
+            escapeHtml(String(value != null ? value : "")) +
+            '"></div>'
+          );
+        }
+        function formSelect(label, id, options, selected) {
+          let html =
+            '<div class="form-group"><label>' +
+            label +
+            '</label><select id="' +
+            id +
+            '">';
+          options.forEach(function (o) {
+            html +=
+              '<option value="' +
+              o +
+              '"' +
+              (o === selected ? " selected" : "") +
+              ">" +
+              o +
+              "</option>";
+          });
+          html += "</select></div>";
+          return html;
+        }
+
+        function closeModal() {
+          document.getElementById("modalOverlay").classList.remove("active");
+          editingId = null;
+          editingType = null;
+        }
+
+        function saveModal() {
+          if (editingType === "income") {
+            saveIncome();
+          } else if (editingType === "expense") {
+            saveExpense();
+          } else if (editingType === "donor") {
+            saveDonor();
+          } else if (editingType === "budget") {
+            saveBudget();
+          } else if (editingType === "inventoryItem") {
+            saveInventoryItem();
+          } else if (editingType === "employee") {
+            saveEmployee();
+          } else if (editingType === "user") {
+            saveUser();
+          }
+        }
+
+        function val(id) {
+          const el = document.getElementById(id);
+          return el ? el.value.trim() : "";
+        }
+        function numVal(id) {
+          return Number(val(id)) || 0;
+        }
+
+        function saveIncome() {
+          const d = val("mDate");
+          const cat = val("mCategory");
+          const donor = val("mDonor");
+          const amt = numVal("mAmount");
+          const method = val("mMethod");
+          const notes = val("mNotes");
+          if (!d || !donor || amt <= 0) {
+            toast("Please fill in required fields", "error");
+            return;
+          }
+          if (editingId) {
+            const rec = DB.income.find(function (r) {
+              return r.id === editingId;
+            });
+            if (rec) {
+              rec.date = d;
+              rec.category = cat;
+              rec.donor_name = donor;
+              rec.amount = amt;
+              rec.payment_method = method;
+              rec.notes = notes;
+            }
+            addAudit(
+              "Edited Income",
+              "Updated income #" + editingId + ": PKR " + fmt(amt),
+            );
+            toast("Income record updated");
+          } else {
+            DB.income.push({
+              id: nextIds.income++,
+              date: d,
+              category: cat,
+              donor_name: donor,
+              amount: amt,
+              payment_method: method,
+              receipt_number: genReceipt(),
+              notes: notes,
+              created_by: currentUser.username,
+              created_at: now(),
+            });
+            addAudit(
+              "Added Income",
+              cat + " from " + donor + ": PKR " + fmt(amt),
+            );
+            toast("Income added: PKR " + fmt(amt));
+          }
+          closeModal();
+          refreshAll();
+        }
+
+        function saveExpense() {
+          const d = val("mDate");
+          const cat = val("mCategory");
+          const vendor = val("mVendor");
+          const amt = numVal("mAmount");
+          const method = val("mMethod");
+          const bill = val("mBill");
+          const desc = val("mDesc");
+          if (!d || !vendor || amt <= 0) {
+            toast("Please fill in required fields", "error");
+            return;
+          }
+          // Budget alert
+          const curMonth = new Date(d).getMonth();
+          const budgetRec = DB.budgets.find(function (b) {
+            return b.category === cat;
+          });
+          if (budgetRec) {
+            const spent = DB.expenses
+              .filter(function (e) {
+                return (
+                  e.category === cat && new Date(e.date).getMonth() === curMonth
+                );
+              })
+              .reduce(function (s, e) {
+                return s + e.amount;
+              }, 0);
+            if (spent + amt > budgetRec.amount) {
+              toast(
+                "Warning: This expense exceeds the budget for " + cat + "!",
+                "warning",
+              );
+            }
+          }
+          if (editingId) {
+            const rec = DB.expenses.find(function (r) {
+              return r.id === editingId;
+            });
+            if (rec) {
+              rec.date = d;
+              rec.category = cat;
+              rec.vendor = vendor;
+              rec.amount = amt;
+              rec.payment_method = method;
+              rec.bill_number = bill;
+              rec.description = desc;
+            }
+            addAudit(
+              "Edited Expense",
+              "Updated expense #" + editingId + ": PKR " + fmt(amt),
+            );
+            toast("Expense record updated");
+          } else {
+            DB.expenses.push({
+              id: nextIds.expenses++,
+              date: d,
+              category: cat,
+              vendor: vendor,
+              amount: amt,
+              payment_method: method,
+              bill_number:
+                bill || "BILL-" + Date.now().toString(36).toUpperCase(),
+              description: desc,
+              approved_by: currentUser.username,
+              created_at: now(),
+            });
+            addAudit(
+              "Added Expense",
+              cat + " to " + vendor + ": PKR " + fmt(amt),
+            );
+            toast("Expense added: PKR " + fmt(amt));
+          }
+          closeModal();
+          refreshAll();
+        }
+
+        function saveDonor() {
+          const name = val("mName");
+          const phone = val("mPhone");
+          const email = val("mEmail");
+          const type = val("mType");
+          if (!name) {
+            toast("Name is required", "error");
+            return;
+          }
+          if (editingId) {
+            const rec = DB.donors.find(function (r) {
+              return r.id === editingId;
+            });
+            if (rec) {
+              rec.name = name;
+              rec.phone = phone;
+              rec.email = email;
+              rec.type = type;
+            }
+            toast("Donor updated");
+          } else {
+            DB.donors.push({
+              id: nextIds.donors++,
+              name: name,
+              phone: phone,
+              email: email,
+              type: type,
+              total: 0,
+              last_date: "-",
+            });
+            toast("Donor added");
+          }
+          addAudit("Donor " + (editingId ? "Edited" : "Added"), name);
+          closeModal();
+          renderDonors();
+        }
+
+        function saveBudget() {
+          const cat = val("mCategory");
+          const amt = numVal("mAmount");
+          if (amt <= 0) {
+            toast("Amount required", "error");
+            return;
+          }
+          const existing = DB.budgets.find(function (b) {
+            return b.category === cat;
+          });
+          if (existing) {
+            existing.amount = amt;
+          } else {
+            DB.budgets.push({ category: cat, amount: amt });
+          }
+          addAudit("Budget Set", cat + ": PKR " + fmt(amt));
+          toast("Budget for " + cat + " set to PKR " + fmt(amt));
+          closeModal();
+          renderBudget();
+        }
+
+        function saveInventoryItem() {
+          const name = val("mName");
+          const cat = val("mCategory");
+          const qty = numVal("mQty");
+          const price = numVal("mPrice");
+          const reorder = numVal("mReorder");
+          const supplier = val("mSupplier");
+          if (!name || qty < 0) {
+            toast("Name and valid quantity required", "error");
+            return;
+          }
+          if (editingId) {
+            const rec = DB.inventory.find(function (r) {
+              return r.id === editingId;
+            });
+            if (rec) {
+              rec.item_name = name;
+              rec.category = cat;
+              rec.quantity = qty;
+              rec.unit_price = price;
+              rec.reorder_level = reorder;
+              rec.supplier = supplier;
+              rec.last_updated = today();
+            }
+            toast("Item updated");
+          } else {
+            DB.inventory.push({
+              id: nextIds.inventory++,
+              item_name: name,
+              category: cat,
+              quantity: qty,
+              unit_price: price,
+              reorder_level: reorder,
+              supplier: supplier,
+              last_updated: today(),
+            });
+            toast("Item added to inventory");
+          }
+          addAudit(
+            "Inventory " + (editingId ? "Edited" : "Added"),
+            name + " (Qty: " + qty + ")",
+          );
+          closeModal();
+          renderInventory();
+        }
+
+        function saveEmployee() {
+          const name = val("mName");
+          const role = val("mRole");
+          const base = numVal("mBase");
+          const allow = numVal("mAllow");
+          const deduct = numVal("mDeduct");
+          const status = val("mStatus");
+          if (!name || base <= 0) {
+            toast("Name and base salary required", "error");
+            return;
+          }
+          if (editingId) {
+            const rec = DB.employees.find(function (r) {
+              return r.id === editingId;
+            });
+            if (rec) {
+              rec.name = name;
+              rec.role = role;
+              rec.base_salary = base;
+              rec.allowances = allow;
+              rec.deductions = deduct;
+              rec.status = status;
+            }
+            toast("Employee updated");
+          } else {
+            DB.employees.push({
+              id: nextIds.employees++,
+              name: name,
+              role: role,
+              base_salary: base,
+              allowances: allow,
+              deductions: deduct,
+              status: status,
+            });
+            toast("Employee added");
+          }
+          addAudit("Employee " + (editingId ? "Edited" : "Added"), name);
+          closeModal();
+          renderSalary();
+        }
+
+        function saveUser() {
+          const username = val("mUsername");
+          const fullName = val("mFullName");
+          const pass = val("mPassword");
+          const role = val("mUserRole");
+          const email = val("mEmail");
+          const phone = val("mPhone");
+          if (!username || !fullName) {
+            toast("Username and full name required", "error");
+            return;
+          }
+          if (editingId) {
+            const rec = DB.users.find(function (r) {
+              return r.id === editingId;
+            });
+            if (rec) {
+              rec.username = username;
+              rec.full_name = fullName;
+              rec.role = role;
+              rec.email = email;
+              rec.phone = phone;
+              if (pass) {
+                rec.password_hash = pass;
+              }
+            }
+            toast("User updated");
+          } else {
+            if (!pass) {
+              toast("Password is required for new users", "error");
+              return;
+            }
+            DB.users.push({
+              id: nextIds.users++,
+              username: username,
+              password_hash: pass,
+              role: role,
+              full_name: fullName,
+              email: email,
+              phone: phone,
+              is_active: true,
+            });
+            toast("User created");
+          }
+          addAudit(
+            "User " + (editingId ? "Edited" : "Added"),
+            fullName + " (" + role + ")",
+          );
+          closeModal();
+          renderUsers();
+        }
+
+        function editRecord(type, id) {
+          let record;
+          if (type === "income") {
+            record = DB.income.find(function (r) {
+              return r.id === id;
+            });
+          } else if (type === "expense") {
+            record = DB.expenses.find(function (r) {
+              return r.id === id;
+            });
+          } else if (type === "donor") {
+            record = DB.donors.find(function (r) {
+              return r.id === id;
+            });
+          } else if (type === "inventoryItem") {
+            record = DB.inventory.find(function (r) {
+              return r.id === id;
+            });
+          } else if (type === "employee") {
+            record = DB.employees.find(function (r) {
+              return r.id === id;
+            });
+          } else if (type === "user") {
+            record = DB.users.find(function (r) {
+              return r.id === id;
+            });
+          }
+          if (record) {
+            openModal(type, record);
+          }
+        }
+
+        function deleteRecord(type, id) {
+          // Custom confirm dialog instead of native confirm()
+          showConfirmDialog(
+            "Are you sure you want to delete this record? This action will be logged in the audit trail.",
+            function () {
+              if (type === "income") {
+                DB.income = DB.income.filter(function (r) {
+                  return r.id !== id;
+                });
+              } else if (type === "expense") {
+                DB.expenses = DB.expenses.filter(function (r) {
+                  return r.id !== id;
+                });
+              } else if (type === "inventoryItem") {
+                DB.inventory = DB.inventory.filter(function (r) {
+                  return r.id !== id;
+                });
+              }
+              addAudit(
+                "Deleted " + type,
+                "Record #" + id + " deleted by " + currentUser.full_name,
+              );
+              toast("Record deleted");
+              refreshAll();
+            },
+          );
+        }
+
+        function showConfirmDialog(message, onConfirm) {
+          const overlay = document.createElement("div");
+          overlay.className = "modal-overlay active";
+          overlay.style.zIndex = "999";
+          overlay.innerHTML =
+            '<div class="modal" style="width:400px"><div class="modal-header"><h3>Confirm Action</h3></div><div class="modal-body"><p>' +
+            escapeHtml(message) +
+            '</p></div><div class="modal-footer"><button class="btn btn-outline" id="cfmCancel">Cancel</button><button class="btn btn-danger" id="cfmOk">Delete</button></div></div>';
+          document.body.appendChild(overlay);
+          overlay.querySelector("#cfmCancel").onclick = function () {
+            overlay.remove();
+          };
+          overlay.querySelector("#cfmOk").onclick = function () {
+            overlay.remove();
+            onConfirm();
+          };
+        }
+
+        // ---- CSV Export ----
+        function exportCSV(type) {
+          let csv = "";
+          let filename = "";
+          if (type === "income") {
+            csv = "Date,Category,Donor,Amount,Payment Method,Receipt,Notes\n";
+            DB.income.forEach(function (r) {
+              csv +=
+                r.date +
+                "," +
+                r.category +
+                ',"' +
+                r.donor_name +
+                '",' +
+                r.amount +
+                "," +
+                r.payment_method +
+                "," +
+                r.receipt_number +
+                ',"' +
+                (r.notes || "") +
+                '"\n';
+            });
+            filename = "income_report.csv";
+          } else if (type === "expenses") {
+            csv =
+              "Date,Category,Vendor,Amount,Payment Method,Bill,Description\n";
+            DB.expenses.forEach(function (r) {
+              csv +=
+                r.date +
+                "," +
+                r.category +
+                ',"' +
+                r.vendor +
+                '",' +
+                r.amount +
+                "," +
+                r.payment_method +
+                "," +
+                r.bill_number +
+                ',"' +
+                r.description +
+                '"\n';
+            });
+            filename = "expense_report.csv";
+          } else if (type === "inventory") {
+            csv =
+              "Item,Category,Quantity,Unit Price,Value,Reorder Level,Supplier\n";
+            DB.inventory.forEach(function (r) {
+              csv +=
+                '"' +
+                r.item_name +
+                '",' +
+                r.category +
+                "," +
+                r.quantity +
+                "," +
+                r.unit_price +
+                "," +
+                r.quantity * r.unit_price +
+                "," +
+                r.reorder_level +
+                ',"' +
+                r.supplier +
+                '"\n';
+            });
+            filename = "inventory_report.csv";
+          }
+          const blob = new Blob([csv], { type: "text/csv" });
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(blob);
+          a.download = filename;
+          a.click();
+          URL.revokeObjectURL(a.href);
+          toast("CSV exported: " + filename);
+          addAudit("CSV Export", filename);
+        }
+
+        // ---- Table Filter ----
+        function filterTable(section, query) {
+          query = query.toLowerCase();
+          let tableId;
+          if (section === "income") {
+            tableId = "incomeTable";
+          } else if (section === "expenses") {
+            tableId = "expenseTable";
+          } else if (section === "donors") {
+            tableId = "donorTable";
+          } else if (section === "inventory") {
+            tableId = "inventoryTable";
+          }
+          const rows = document.querySelectorAll("#" + tableId + " tbody tr");
+          rows.forEach(function (row) {
+            row.style.display =
+              row.textContent.toLowerCase().indexOf(query) !== -1 ? "" : "none";
+          });
+        }
+
+        // ---- i18n toggle ----
+        function toggleLang() {
+          currentLang = currentLang === "en" ? "ur" : "en";
+          document.getElementById("langLabel").textContent =
+            currentLang === "en" ? "اردو" : "English";
+          document.querySelectorAll("[data-i18n]").forEach(function (el) {
+            const key = el.getAttribute("data-i18n");
+            if (i18n[currentLang][key]) {
+              el.textContent = i18n[currentLang][key];
+            }
+          });
+          if (currentLang === "ur") {
+            document.body.style.direction = "rtl";
+            document.body.classList.add("urdu-text");
+          } else {
+            document.body.style.direction = "ltr";
+            document.body.classList.remove("urdu-text");
+          }
+        }
+
+        // ---- Init ----
+        function init() {
+          initDarkMode();
+
+          // Login
+          document.getElementById("loginBtn").addEventListener("click", login);
+          document
+            .getElementById("loginPass")
+            .addEventListener("keydown", function (e) {
+              if (e.key === "Enter") {
+                login();
+              }
+            });
+          document
+            .getElementById("loginUser")
+            .addEventListener("keydown", function (e) {
+              if (e.key === "Enter") {
+                document.getElementById("loginPass").focus();
+              }
+            });
+
+          // Logout
+          document
+            .getElementById("logoutBtn")
+            .addEventListener("click", logout);
+
+          // Nav
+          document
+            .querySelectorAll(".nav-item[data-page]")
+            .forEach(function (item) {
+              item.addEventListener("click", function () {
+                navigate(this.getAttribute("data-page"));
+              });
+            });
+
+          // Mobile menu
+          document
+            .getElementById("menuToggle")
+            .addEventListener("click", function () {
+              document.getElementById("sidebar").classList.toggle("open");
+            });
+
+          // Lang toggle
+          document
+            .getElementById("langToggle")
+            .addEventListener("click", toggleLang);
+
+          // Notification button
+          document
+            .getElementById("notifBtn")
+            .addEventListener("click", function () {
+              const lowStock = DB.inventory.filter(function (r) {
+                return r.quantity <= r.reorder_level;
+              });
+              let msg = "Notifications:\n";
+              if (lowStock.length) {
+                msg +=
+                  "• " +
+                  lowStock.length +
+                  " inventory items below reorder level\n";
+              }
+              const overBudget = DB.budgets.filter(function (b) {
+                const actual = DB.expenses
+                  .filter(function (e) {
+                    return e.category === b.category;
+                  })
+                  .reduce(function (s, e) {
+                    return s + e.amount;
+                  }, 0);
+                return actual > b.amount;
+              });
+              if (overBudget.length) {
+                msg += "• " + overBudget.length + " categories over budget\n";
+              }
+              if (!lowStock.length && !overBudget.length) {
+                msg += "• All clear! No pending alerts.";
+              }
+              toast(msg.replace(/\n/g, " | "), "info");
+            });
+
+          // Report dates default
+          const d = new Date();
+          const firstOfMonth = new Date(d.getFullYear(), d.getMonth(), 1)
+            .toISOString()
+            .split("T")[0];
+          document.getElementById("reportFrom").value = "2025-01-01";
+          document.getElementById("reportTo").value = today();
+        }
+
+        init();
+
+        // Public API
+        return {
+          openModal: openModal,
+          closeModal: closeModal,
+          editRecord: editRecord,
+          deleteRecord: deleteRecord,
+          exportCSV: exportCSV,
+          exportPDF: exportPDF,
+          filterTable: filterTable,
+          generateReport: generateReport,
+          processSalaries: processSalaries,
+        };
+      })();
+    </script>
+  </body>
+</html>
